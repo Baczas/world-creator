@@ -10,6 +10,7 @@ clock =pygame.time.Clock()
 
 grass_img = pygame.image.load('grass.png')
 dirt_img = pygame.image.load('dirt.png')
+floor_metal_img = pygame.image.load('floor_metal.png')
 
 font = pygame.font.SysFont('comicsans', 20)
 
@@ -21,7 +22,7 @@ def exit():
 
 def save(data):
 
-    file_name = input('Podaj nazwe pliku')
+    file_name = input('Give the file name')
     with open(file_name +'.json', 'w') as file:
         json.dump(data, file)
     # f = open(file_name + '.txt', 'w')
@@ -37,9 +38,9 @@ def create_world_table(width, height, value=0):
             # value += 1
     return world_block
 
-name = input('Otworz plik O / Nowy plik n : ')
+name = input('Open file O / New file n : ')
 if name == 'O':
-    with open(input('give the name of the .json file: ') + '.json') as json_file:
+    with open(input('Give the name of the .json file: ') + '.json') as json_file:
         blocks = json.load(json_file)
         width = len(blocks)
         print(width)
@@ -47,8 +48,8 @@ if name == 'O':
         print(height)
 
 elif name == 'n':
-    width = int(input('podaj szerokosc: '))
-    height = int(input('podaj wysokosc: '))
+    width = int(input('Give width: '))
+    height = int(input('Give height: '))
 
     blocks = create_world_table(width, height)
     # walls = create_world_table(width, height)
@@ -59,21 +60,23 @@ brush = 1
 ts = 32
 menu = True
 while True:
-    display.fill((0,0,0))
+    display.fill((146, 244, 255))
 
     for x in range(shift[0]//ts,shift[0]//ts+WINDOW_SIZE[0]//ts +2):
         for y in range(shift[1]//ts,shift[1]//ts+WINDOW_SIZE[1]//ts +2):
             if -ts < x*ts-shift[0] < WINDOW_SIZE[0] and -ts < y*ts-shift[1] < WINDOW_SIZE[1]:
-                if blocks[x][y] == 0:
-                    pass
-                    pygame.draw.rect(display, (250,152,33), (x*ts-shift[0],y*ts-shift[1],ts,ts))
-                elif blocks[x][y] == 1:
-                    pygame.draw.rect(display, (250,0,133), (x*ts-shift[0],y*ts-shift[1],ts,ts), 4)
+
+                if blocks[x][y] == 1:
+                    #pygame.draw.rect(display, (250,0,133), (x*ts-shift[0],y*ts-shift[1],ts,ts), 4)
                     display.blit(grass_img, (x * ts - shift[0], y * ts - shift[1], ts, ts))
 
                 elif blocks[x][y] == 2:
-                    pygame.draw.rect(display, (250,250,133), (x*ts-shift[0],y*ts-shift[1],ts,ts))
+                    #pygame.draw.rect(display, (250,250,133), (x*ts-shift[0],y*ts-shift[1],ts,ts))
                     display.blit(dirt_img, (x * ts - shift[0], y * ts - shift[1], ts, ts))
+
+                elif blocks[x][y] == 3:
+                    #pygame.draw.rect(display, (250,250,133), (x*ts-shift[0],y*ts-shift[1],ts,ts))
+                    display.blit(floor_metal_img, (x * ts - shift[0], y * ts - shift[1], ts, ts))
 
 
     M_x, M_y = pygame.mouse.get_pos()[0]+ shift[0], pygame.mouse.get_pos()[1]+shift[1]
@@ -93,8 +96,7 @@ while True:
         else:
             pass
 
-        if pygame.key.get_pressed()[pygame.K_2]:
-            brush = 2
+
 
         if pygame.key.get_pressed()[pygame.K_w]:
             shift[1] -= speed
@@ -130,13 +132,32 @@ while True:
         caption = font.render('TAB to hide', 1, (250, 250, 250))
         display.blit(caption, (WINDOW_SIZE[0]-90, 1))
 
-        display.blit(grass_img, (WINDOW_SIZE[0]-100 + 34, 10+10))
-        if (pygame.mouse.get_pressed()[0] and WINDOW_SIZE[0]-100 + 34 < pygame.mouse.get_pos()[0] < WINDOW_SIZE[0]- 34 and 10+10 < pygame.mouse.get_pos()[1] < 10 +10+ 32) or pygame.key.get_pressed()[pygame.K_1]:
+        display.blit(grass_img, (WINDOW_SIZE[0]-100 + 34, 20))
+        if pygame.mouse.get_pressed()[0] and WINDOW_SIZE[0]-100 + 34 < pygame.mouse.get_pos()[0] < WINDOW_SIZE[0]- 34 and 20 < pygame.mouse.get_pos()[1] < 20 + 32:
             brush = 1
 
-        display.blit(dirt_img, (WINDOW_SIZE[0] - 100 + 34, 10 + +10+10 + 32))
-        if (pygame.mouse.get_pressed()[0] and WINDOW_SIZE[0]-100 + 34 < pygame.mouse.get_pos()[0] < WINDOW_SIZE[0]- 34 and 10 + 10+10 +32 < pygame.mouse.get_pos()[1] < 10+2*(10 + 32)) or pygame.key.get_pressed()[pygame.K_2]:
+        display.blit(dirt_img, (WINDOW_SIZE[0] - 100 + 34, 20 + 1*(10 + 32)))
+        if pygame.mouse.get_pressed()[0] and WINDOW_SIZE[0]-100 + 34 < pygame.mouse.get_pos()[0] < WINDOW_SIZE[0]- 34 and 20 +1*(10 +32) < pygame.mouse.get_pos()[1] < 20 + 1*10 + (1+1)*32:
             brush = 2
+
+        pygame.draw.rect(display, (250,0,50), (WINDOW_SIZE[0] - 100 + 34, 20 + 2*(10 + 32), ts, ts),1)
+        display.blit(floor_metal_img, (WINDOW_SIZE[0] - 100 + 34, 20 + 2*(10 + 32)))
+        if pygame.mouse.get_pressed()[0] and WINDOW_SIZE[0] - 100 + 34 < pygame.mouse.get_pos()[0] < WINDOW_SIZE[0] - 34 and 20 + 2*(10 + 32) < pygame.mouse.get_pos()[1] < 20 + 2*10 + (2+1)*32:
+            brush = 3
+
+    # key pressed
+    if pygame.key.get_pressed()[pygame.K_1]:
+        brush = 1
+    if pygame.key.get_pressed()[pygame.K_2]:
+        brush = 2
+    if pygame.key.get_pressed()[pygame.K_3]:
+        brush = 3
+    if pygame.key.get_pressed()[pygame.K_4]:
+        brush = 4
+    if pygame.key.get_pressed()[pygame.K_5]:
+        brush = 5
+    if pygame.key.get_pressed()[pygame.K_6]:
+        brush = 6
 
     # Save
     if pygame.key.get_pressed()[pygame.K_F12]:
